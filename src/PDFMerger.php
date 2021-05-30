@@ -117,11 +117,11 @@ class PDFMerger {
      *
      * @return void
      */
-    public function addPDFString($string, $pages = 'all', $orientation = null){
+    public function addPDFString($string, $pages = 'all', $orientation = null, $bookmark = null){
         $filePath = storage_path('tmp/'.Str::random(16).'.pdf');
         $this->filesystem->put($filePath, $string);
         $this->tmpFiles->push($filePath);
-        return $this->addPathToPDF($filePath, $pages, $orientation);
+        return $this->addPathToPDF($filePath, $pages, $orientation, $bookmark);
     }
     /**
      * Add a PDF for inclusion in the merge with a valid file path. Pages should be formatted: 1,3,6, 12-16.
@@ -133,17 +133,18 @@ class PDFMerger {
      *
      * @throws \Exception if the given pages aren't correct
      */
-    public function addPathToPDF($filePath, $pages = 'all', $orientation = null) {
+    public function addPathToPDF($filePath, $pages = 'all', $orientation = null, $bookmark = null) {
         if (file_exists($filePath)) {
           $filePath = $this->convertPDFVersion($filePath);
           if (!is_array($pages) && strtolower($pages) != 'all') {
               throw new \Exception($filePath."'s pages could not be validated");
           }
           $this->files->push([
-              'name'  => $filePath,
-              'pages' => $pages,
-              'orientation' => $orientation
-          ]);
+            'name'        => $filePath,
+            'pages'       => $pages,
+            'orientation' => $orientation,
+            'bookmark'    => $bookmark
+        ]);
         } else {
             throw new \Exception("Could not locate PDF on '$filePath'");
         }
@@ -192,6 +193,7 @@ class PDFMerger {
         if ($duplex && $pages % 2 && $index < (count($files) - 1)) {
           $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
         }
+        $fpdi->Bookmark($file['bookmark'], false);
       }
     }
 

@@ -12,6 +12,13 @@
       "pdf-merger"
     ],
     "license": "MIT",
+    "repositories": [
+      {
+          "name": "gfernandez-me/fpdi",
+          "type": "vcs",
+          "url": "https://github.com/gfernandez-me/fpdi"
+      }
+    ],
     "authors": [
       {
         "name": "Gabriel Fernandez"
@@ -19,7 +26,8 @@
     ],
     "require": {
       "illuminate/support": ">=8.27.0",
-      "setasign/fpdi-fpdf": ">=2.3.0",
+      "setasign/fpdf": "^1.8.2",
+      "gfernandez-me/fpdi": "^3.0.0",
       "laravel/helpers": "^1.2"
     },
     "autoload": {
