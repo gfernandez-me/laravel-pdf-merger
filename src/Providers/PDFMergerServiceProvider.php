@@ -2,8 +2,8 @@
 
 namespace GFernandezMe\LaravelPDFMerger\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use GFernandezMe\LaravelPDFMerger\PDFMerger;
+use Illuminate\Support\ServiceProvider;
 
 class PDFMergerServiceProvider extends ServiceProvider
 {
