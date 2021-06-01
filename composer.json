@@ -27,7 +27,7 @@
     "require": {
       "illuminate/support": ">=8.27.0",
       "setasign/fpdf": "^1.8.2",
-      "gfernandez-me/fpdi": "^3.0.0",
+      "gfernandez-me/fpdi": "dev-master",
       "laravel/helpers": "^1.2"
     },
     "autoload": {
