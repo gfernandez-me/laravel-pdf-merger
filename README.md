@@ -66,7 +66,7 @@ $merger->save(base_path('/public/pdfs/merged.pdf'));
 ```
 
 ## Authors
-* [GrofGraf](https://github.com/GrofGraf)
+* [GabrielFernandez](https://github.com/gfernandez-me)
 
 
 ## Credits

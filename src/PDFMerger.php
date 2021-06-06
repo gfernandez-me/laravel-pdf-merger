@@ -151,12 +151,12 @@ class PDFMerger {
         return $this;
     }
     /**
-     * Merges your provided PDFs and outputs to specified location.
+     * Merges your provided PDF and outputs to specified location.
      * @param string $orientation
      *
      * @return void
      *
-     * @throws \Exception if there are now PDFs to merge
+     * @throws \Exception if there are now PDF to merge
      */
     public function duplexMerge($orientation = 'P'){
       $this->merge($orientation, true);
@@ -164,7 +164,7 @@ class PDFMerger {
 
     public function merge($orientation = 'P', $duplex = false) {
       if ($this->files->count() == 0) {
-          throw new \Exception("No PDFs to merge.");
+          throw new \Exception("No PDF to merge.");
       }
       $fpdi = $this->fpdi;
       $files = $this->files;
@@ -178,9 +178,13 @@ class PDFMerger {
             $size       = $fpdi->getTemplateSize($template);
             $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
             $fpdi->useTemplate($template);
+            if($i === 1){
+                $fpdi->Bookmark($file['bookmark'], false);
+            }
           }
         }else {
           $pages = count($file['pages']);
+          $count = 1;
           foreach ($file['pages'] as $page) {
             if (!$template = $fpdi->importPage($page)) {
               throw new \Exception("Could not load page '$page' in PDF '".$file['name']."'. Check that the page exists.");
@@ -188,12 +192,15 @@ class PDFMerger {
             $size = $fpdi->getTemplateSize($template);
             $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
             $fpdi->useTemplate($template);
+            if($count === 1){
+                $fpdi->Bookmark($file['bookmark'], false);
+            }
+            $count++;
           }
         }
         if ($duplex && $pages % 2 && $index < (count($files) - 1)) {
           $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
         }
-        $fpdi->Bookmark($file['bookmark'], false);
       }
     }
 
