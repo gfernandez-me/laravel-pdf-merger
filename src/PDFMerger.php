@@ -133,7 +133,7 @@ class PDFMerger {
      *
      * @throws \Exception if the given pages aren't correct
      */
-    public function addPathToPDF($filePath, $pages = 'all', $orientation = null, $bookmark = null) {
+    public function addPathToPDF($filePath, $pages = 'all', $orientation = null, $meta = null) {
         if (file_exists($filePath)) {
           $filePath = $this->convertPDFVersion($filePath);
           if (!is_array($pages) && strtolower($pages) != 'all') {
@@ -143,7 +143,7 @@ class PDFMerger {
             'name'        => $filePath,
             'pages'       => $pages,
             'orientation' => $orientation,
-            'bookmark'    => $bookmark
+            'meta'        => $meta
         ]);
         } else {
             throw new \Exception("Could not locate PDF on '$filePath'");
@@ -168,6 +168,7 @@ class PDFMerger {
       }
       $fpdi = $this->fpdi;
       $files = $this->files;
+      $count_pages = 1;
       foreach($files as $index => $file){
         $file['orientation'] = is_null($file['orientation']) ? $orientation : $file['orientation'];
         $count = $fpdi->setSourceFile($file['name']);
@@ -178,9 +179,15 @@ class PDFMerger {
             $size       = $fpdi->getTemplateSize($template);
             $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
             $fpdi->useTemplate($template);
-            if($i === 1){
-                $fpdi->Bookmark($file['bookmark'], false);
+            // STAMP
+            if(!empty($file['meta'])){
+                $this->Stamp($file['meta'], $i, $count_pages);
             }
+            // BOOKMARK
+            if($i === 1 && !empty($file['meta']['label'])){
+                $fpdi->Bookmark(($index).'.'.$file['meta']['label'], false);
+            }
+            $count_pages++;
           }
         }else {
           $pages = count($file['pages']);
@@ -192,16 +199,49 @@ class PDFMerger {
             $size = $fpdi->getTemplateSize($template);
             $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
             $fpdi->useTemplate($template);
-            if($count === 1){
-                $fpdi->Bookmark($file['bookmark'], false);
+            // STAMP
+            if(!empty($file['meta'])){
+                $this->Stamp($file['meta'], $count, $count_pages);
+            }
+            // BOOKMARK
+            if($count === 1 && !empty($file['meta']['label'])){
+                $fpdi->Bookmark(($index).'.'.$file['meta']['label'], false);
             }
             $count++;
+            $count_pages++;
           }
         }
         if ($duplex && $pages % 2 && $index < (count($files) - 1)) {
           $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
         }
       }
+    }
+
+    private function Stamp($meta, $current_page, $page){
+
+        $fpdi = $this->fpdi;
+
+        $fpdi->SetY(5);
+        $fpdi->SetX(-50);
+        $fpdi->SetFont('Arial', 'B', 8);
+        $fpdi->Cell(45, 5, 'Processo '.$meta['id'], 'TLR', 0, 'L');
+        $fpdi->Ln();
+
+        $fpdi->SetFont('Arial', '', 8);
+        $fpdi->SetX(-50);
+        $fpdi->Cell(45, 5, utf8_decode('página '.$page.' da peça unificada'), 'LRB', 0, 'L');
+        $fpdi->Ln();
+        $fpdi->SetX(-50);
+        $fpdi->MultiCell(45, 5, utf8_decode($meta['label']), 'LR');
+        //$fpdi->Cell(45, 5, utf8_decode($meta['label']), 'LR', 0, 'L');
+        //$fpdi->Ln();
+        $fpdi->SetX(-50);
+        $fpdi->Cell(45, 5, utf8_decode('página '.$current_page), 'LR', 0, 'L');
+        $fpdi->Ln();
+
+        // Closing line
+        $fpdi->SetX(-50);
+        $fpdi->Cell(45, 0, '', 'T');
     }
 
     /**
