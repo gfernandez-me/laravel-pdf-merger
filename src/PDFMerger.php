@@ -89,7 +89,9 @@ class PDFMerger {
      * @return string
      */
     public function save($filePath = null){
-      return $this->filesystem->put($filePath ? $filePath : $this->fileName, $this->string());
+      $result = $this->filesystem->put($filePath ? $filePath : $this->fileName, $this->string());
+        $this->__destruct();
+        return $result;
     }
     /**
      * Get the merged PDF content as binary string
