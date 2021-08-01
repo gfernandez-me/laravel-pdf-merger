@@ -179,7 +179,7 @@ class PDFMerger {
           for ($i = 1; $i <= $count; $i++) {
             $template   = $fpdi->importPage($i);
             $size       = $fpdi->getTemplateSize($template);
-            $fpdi->AddPage($file['orientation'], [$size['width'], $size['height']]);
+            $fpdi->AddPage(($file['orientation']=='A'?($size['height'] > $size['width'] ? 'P' : 'L'):$file['orientation']), [$size['width'], $size['height']]);
             $fpdi->useTemplate($template);
             // STAMP
             if(!empty($file['meta'])){
